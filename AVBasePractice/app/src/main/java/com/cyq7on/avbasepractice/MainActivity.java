@@ -7,11 +7,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import com.cyq7on.avbasepractice.view.MyImageView;
 import com.cyq7on.avbasepractice.view.MySurfaceView;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private MySurfaceView surfaceView;
+    private MyImageView myImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,12 +23,14 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         imageView = findViewById(R.id.imageView);
         surfaceView = findViewById(R.id.surfaceView);
+        myImageView = findViewById(R.id.myImageView);
 
         showOnImageView();
     }
 
     void showOnImageView() {
         imageView.setImageResource(R.drawable.android_logo);
+        myImageView.setImageResource(R.drawable.android_logo);
     }
 
     @Override

@@ -12,6 +12,8 @@ import android.view.SurfaceView;
 
 import com.cyq7on.avbasepractice.R;
 
+import java.io.InputStream;
+
 /**
  * Created by cyq7on on 18-3-13.
  */
@@ -20,16 +22,28 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder surfaceHolder;
     private Canvas canvas;
 
+    public MySurfaceView(Context context) {
+        super(context);
+        init();
+    }
+
     public MySurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
+    public MySurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+
+
     private void init() {
         surfaceHolder = getHolder();
         surfaceHolder.addCallback(this);
         //更改背景为透明
-//        setZOrderOnTop(true);
+        setZOrderOnTop(true);
         setFocusable(true);
         setFocusableInTouchMode(true);
         setClickable(true);
@@ -44,17 +58,17 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         paint.setStrokeWidth(10);
 
         canvas = holder.lockCanvas();
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.android_logo);
+//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.android_logo);
 
-//        BitmapFactory.Options opt = new BitmapFactory.Options();
-//        opt.inPreferredConfig = Bitmap.Config.RGB_565;
-//        opt.inPurgeable = true;
-//        opt.inInputShareable = true;
-//        InputStream is = getResources().openRawResource(+R.drawable.android_logo);
-//        Bitmap bitmap =  BitmapFactory.decodeStream(is, null, opt);
+        BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inPreferredConfig = Bitmap.Config.RGB_565;
+        InputStream is = getResources().openRawResource(+R.drawable.android_logo);
+        Bitmap bitmap =  BitmapFactory.decodeStream(is, null, opt);
 
         canvas.drawBitmap(bitmap, 0, 0, paint);
         surfaceHolder.unlockCanvasAndPost(canvas);
+
+        bitmap = null;
 
     }
 
