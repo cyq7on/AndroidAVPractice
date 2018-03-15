@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -21,6 +22,7 @@ import java.io.InputStream;
 public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder surfaceHolder;
     private Canvas canvas;
+    private Bitmap bitmap;
 
     public MySurfaceView(Context context) {
         super(context);
@@ -37,7 +39,17 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         init();
     }
 
-
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+//        super.onMeasure(MeasureSpec.AT_MOST, MeasureSpec.AT_MOST);
+        if (bitmap != null) {
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+            setMeasuredDimension(width, height);
+            Log.d("onMeasure in sur", width + "\n" + height);
+        }
+    }
 
     private void init() {
         surfaceHolder = getHolder();
@@ -47,6 +59,12 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         setFocusable(true);
         setFocusableInTouchMode(true);
         setClickable(true);
+//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.android_logo);
+
+        BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inPreferredConfig = Bitmap.Config.RGB_565;
+        InputStream is = getResources().openRawResource(+R.drawable.android_logo);
+        bitmap = BitmapFactory.decodeStream(is, null, opt);
     }
 
     @Override
@@ -58,12 +76,6 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         paint.setStrokeWidth(10);
 
         canvas = holder.lockCanvas();
-//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.android_logo);
-
-        BitmapFactory.Options opt = new BitmapFactory.Options();
-        opt.inPreferredConfig = Bitmap.Config.RGB_565;
-        InputStream is = getResources().openRawResource(+R.drawable.android_logo);
-        Bitmap bitmap =  BitmapFactory.decodeStream(is, null, opt);
 
         canvas.drawBitmap(bitmap, 0, 0, paint);
         surfaceHolder.unlockCanvasAndPost(canvas);
