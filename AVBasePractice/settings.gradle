@@ -1,1 +1,1 @@
-include ':showImage'
+include ':showImage', ':pcmandwav'

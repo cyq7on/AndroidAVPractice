@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">PCMandWav</string>
+    <string name="action_settings">Settings</string>
+    <string name="request_mic">我们需要麦克风权限采集音频</string>
+    <string name="btn_start">开始录音</string>
+    <string name="btn_end">停止录音</string>
+    <string name="btn_play">播放录音</string>
+    <string name="btn_stop">停止播放</string>
+    <string name="msg_deny">请求权限被拒绝</string>
+</resources>
