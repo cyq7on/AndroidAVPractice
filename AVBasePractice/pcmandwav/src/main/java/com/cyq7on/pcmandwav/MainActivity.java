@@ -30,7 +30,7 @@ import static android.media.AudioTrack.MODE_STREAM;
 
 public class MainActivity extends AppCompatActivity {
     private File audioFile;
-    private boolean isRecord = true;
+    private boolean isRecord;
     private AudioTrack player;
 
     @Override
@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startRecord() {
+        isRecord = true;
         audioFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
                 "/test.pcm");
         if (audioFile.exists()) {
@@ -102,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
             byte bytes[] = new byte[minBufferSize];
             while (isRecord) {
                 int length = audioRecord.read(bytes, 0, minBufferSize);
-                if(length > 0){
+//                Log.d("test", "minBufferSize:" + minBufferSize + "\n" + "length:" + length);
+                if (length > 0) {
                     os.write(bytes);
                 }
             }
@@ -125,25 +127,33 @@ public class MainActivity extends AppCompatActivity {
         audioFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
                 "/test.pcm");
         if (audioFile.exists()) {
-            int length = (int) audioFile.length();
-            byte bytes[] = new byte[length];
             int sampleRateInHz = 44100;
-            if (Build.VERSION.SDK_INT >= 23) {
-                player = new AudioTrack.Builder().
-                        setAudioFormat(new AudioFormat.Builder()
-                                .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                                .setSampleRate(sampleRateInHz)
-                                .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                                .build())
-                        .setBufferSizeInBytes(length)
-                        .build();
-            } else {
-                if(player == null){
+            int channelConfig = AudioFormat.CHANNEL_OUT_MONO;
+            int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+            int minBufferSize = AudioTrack.getMinBufferSize(sampleRateInHz , channelConfig , audioFormat);
+
+            //实测length参数很重要，太大或者大小都有可能导致异常：play() called on uninitialized AudioTrack
+//            int length = (int) audioFile.length();
+            int length = minBufferSize + 1024;
+            byte bytes[] = new byte[length];
+            if (player == null) {
+                if (Build.VERSION.SDK_INT >= 23) {
+
+                    player = new AudioTrack.Builder().
+                            setAudioFormat(new AudioFormat.Builder()
+                                    .setEncoding(audioFormat)
+                                    .setSampleRate(sampleRateInHz)
+                                    .setChannelMask(channelConfig)
+                                    .build())
+                            .setBufferSizeInBytes(length)
+                            .build();
+                } else {
                     player = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRateInHz,
-                            AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
+                            channelConfig, audioFormat,
                             length, MODE_STREAM);
                 }
             }
+
             try {
                 InputStream is = new FileInputStream(audioFile);
 /*//                BufferedInputStream bis = new BufferedInputStream(is);
@@ -155,25 +165,26 @@ public class MainActivity extends AppCompatActivity {
                 }
                 dis.close();*/
 
+
                 int read;
                 while ((read = is.read(bytes)) > 0) {
                     player.write(bytes, 0, read);
                 }
-                is.close();
-
                 player.play();
+                is.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }else {
+        } else {
             toast("音频文件不存在");
         }
 
     }
 
     private void stopPlay() {
-        if(player != null){
+        if (player != null && player.getPlayState() == AudioTrack.PLAYSTATE_PLAYING) {
             player.stop();
+            player.release();
         }
     }
 
